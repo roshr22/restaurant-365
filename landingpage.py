@@ -1,0 +1,2 @@
+import customer_service
+customer_service.seat_reservation()
