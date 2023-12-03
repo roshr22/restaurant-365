@@ -8,7 +8,7 @@ At Restaurant 365, we specialize in helping restaurant owners maximize their bus
 - Menu
 - Salary Management
 - Staff Scheduling
-- 
+
 ## Language Used
 Python
 
