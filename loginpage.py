@@ -45,6 +45,7 @@ def login_page(root1):
 
         except FileNotFoundError:
             messagebox.showerror('Error', "Account doesn't exist! Sign up now!")
+            return
 
         for i in range(2, worksheet.max_row + 1):
             email_excel = worksheet[f'{column_names["Email"]}{i}'].value
@@ -57,6 +58,8 @@ def login_page(root1):
                 break
         else:
             messagebox.showerror("Error", f"{email_id} not registered... Sign up now!")
+
+        workbook.close()
             
     customtkinter.set_appearance_mode("dark")
     root = Tk()

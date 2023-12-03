@@ -36,3 +36,5 @@ def data(registration_number, email_id, password_, restaurant_name, phone_number
         worksheet[f'{column_names["State"]}{worksheet.max_row}'] = state_
         worksheet[f'{column_names["Pincode"]}{worksheet.max_row}'] = pincode_
         workbook.save("User_Data.xlsx")
+
+    workbook.close()
