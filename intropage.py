@@ -19,9 +19,9 @@ root.geometry('1366x768')
 root.state('zoomed')
 
 # Placing a background image
-bgImage = ImageTk.PhotoImage(file='intro.png')
-bgLabel = Label(root, image=bgImage)
-bgLabel.place(x=0, y=0)
+bgimage = ImageTk.PhotoImage(file='intro.png')
+bglabel = Label(root, image=bgimage)
+bglabel.place(x=0, y=0)
 
 # Buttons
 nextbutton = Button(root, text='Next', font=('Garamond', 25), fg='black', bg='#f2f2e2', activeforeground='black',
