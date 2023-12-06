@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import messagebox
+from tkinter import ttk
 import customtkinter
 import os
 from openpyxl import *
@@ -32,14 +33,83 @@ def excel(registration_number):
     workbook.save(final_directory)
 
 
-def number_of_tables(registration_number):  # Add root1,
+def working_hours(registration_number):
+    def times():
+        l = []
+        for i in range(0,24):
+            if len(str(i)) == 1:
+                l.append(f'0{i}:00')
+                l.append(f'0{i}:30')
+            else:
+                l.append(f'{i}:00')
+                l.append(f'{i}:30')
+        return l
+
+    def check(event):
+        if closingtimedropdown.get() != " " and len(closingtimedropdown.get())!=0:
+            if (int(closingtimedropdown.get()[0:2]) < int(openingtimedropdown.get()[0:2])) or (int(closingtimedropdown.get()[0:2]) == int(openingtimedropdown.get()[0:2]) and int(closingtimedropdown.get()[3:]) <= int(openingtimedropdown.get()[3:])):
+                closingtimedropdown["textvariable"] = " "
+                    
+    def closingtimes(event):
+        x = times()
+        l1=[]
+        for i in x:
+            if (int(i[0:2]) > int(openingtimedropdown.get()[0:2])):
+                l1.append(i)
+            elif int(i[0:2]) == int(openingtimedropdown.get()[0:2]) and int(i[3:]) > int(openingtimedropdown.get()[3:]):
+                l1.append(i)
+        closingtimedropdown["values"] = l1
+
+    def addtiming():
+        workbook = load_workbook("User_Data.xlsx")
+        worksheet = workbook["User Data"]
+        worksheet['I1'] = "Opening Time"
+        worksheet['J1'] = "Closing Time"
+        if (int(closingtimedropdown.get()[0:2]) > int(openingtimedropdown.get()[0:2])) or (int(closingtimedropdown.get()[0:2]) == int(openingtimedropdown.get()[0:2]) and int(closingtimedropdown.get()[3:]) > int(openingtimedropdown.get()[3:])):
+             worksheet[f'I{worksheet.max_row}'] = openingtimedropdown.get()
+             worksheet[f'J{worksheet.max_row}'] = closingtimedropdown.get()
+        workbook.save("User_Data.xlsx")
+        
+    customtkinter.set_appearance_mode("dark")
+    root = Tk()
+    root.geometry('1366x768')
+    root.state('zoomed')
+
+    bgimage = ImageTk.PhotoImage(file='workinghours.png')
+    bglabel = Label(root, image=bgimage)
+    bglabel.place(x=0, y=0)
+
+    openingtimelabel = Label(root, bg="white", fg="black", text="Opening Time", font=('Garamond', 22), bd=0)
+    openingtimelabel.place(x=450, y=293)
+ 
+    openingtimedropdown = ttk.Combobox(root, width=6, font=('Garamond', 22), textvariable=StringVar(value=" "))
+    openingtimedropdown['values'] = times()
+    openingtimedropdown.bind("<<ComboboxSelected>>", check)
+    openingtimedropdown['state'] = 'readonly'
+    openingtimedropdown.place(x=750, y=290)
+
+    closingtimelabel = Label(root, bg="white", fg="black", text="Closing Time", font=('Garamond', 22), bd=0)
+    closingtimelabel.place(x=450, y=357)
+
+    closingtimedropdown = ttk.Combobox(root, width=6, font=('Garamond', 22), textvariable=StringVar(value=" "))
+    closingtimedropdown["values"] = [""]
+    closingtimedropdown.bind("<ButtonPress>", closingtimes)
+    closingtimedropdown['state']='readonly'
+    closingtimedropdown.place(x=750, y=350)
+
+    continuebutton = Button(root, bg="#015450", fg="white", activebackground="#015450", activeforeground="white",
+                            text="Continue", font=('Garamond', 22), bd=0, cursor='hand2', command = lambda:(addtiming(), number_of_tables(registration_number, root)))
+    continuebutton.place(x=595, y=450)
+    root.mainloop()
+
+def number_of_tables(registration_number, root1):
 
     def tablecount_check():
         if (tablecount.get().strip().isdigit() is True and int(tablecount.get().strip()) > 0):
             tables(tablecount.get().strip(), root)
         else:
             messagebox.showerror('Error', 'Invalid Table Count')
-    # root1.destroy()
+    root1.destroy()
     excel(registration_number)
     customtkinter.set_appearance_mode("dark")
     root = Tk()
@@ -74,7 +144,7 @@ def tables(tablecount, root1):
             if capacity[x-1].get().strip() == "":
                 messagebox.showerror('Error', f'Enter Capacity of Table {x}')
                 break
-            elif capacity[x-1].get().strip().isdigit() is False or int(capacity[x-1].get().strip()) > "0":
+            elif capacity[x-1].get().strip().isdigit() is False or int(capacity[x-1].get().strip()) < 0:
                 messagebox.showerror('Error', f'Invalid Input for Table {x}')
                 break
             else:
@@ -116,9 +186,7 @@ def tables(tablecount, root1):
     frame = Frame(canvas, width=390, height=345, bg="white")
 
     capacity = []
-    x1=15
-    y1=15
-    # Create 10 labels and entry boxes and add them to the frame
+    # Create labels and entry boxes and add them to the frame
     for i in range(1, int(tablecount)+1):
         exec(f'table{i}label = Label(frame, text=f"Table {i}", bg="white", fg="black", font=("Garamond", 20), bd=0)')
         exec(f'table{i}capacity = Entry(frame, bg="white", fg="black", font=("Garamond", 20), width=5, bd=0, highlightthickness=1, justify="center")')
@@ -146,6 +214,6 @@ def tables(tablecount, root1):
     # Start the main loop
     root.mainloop()
 
-number_of_tables("11111111111111")
+working_hours("11111111111111")
 
 
