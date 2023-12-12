@@ -164,9 +164,8 @@ def tables(tablecount, root1, openingtime, closingtime):
         worksheet = workbook["Tables"]
         l=[]
         for x in range(int(openingtime[0:2]), int(closingtime[0:2])+1):
-            if openingtime.endswith("30") is True:
+            if x == int(openingtime[0:2]) and openingtime.endswith("30") is True:
                 l.append(openingtime)
-                continue
             elif x == int(closingtime[0:2]) and closingtime.endswith("00") is True:
                 l.append(closingtime)
                 break

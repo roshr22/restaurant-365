@@ -6,6 +6,7 @@ from PIL import ImageTk
 
 def customerservicepage():
     import customerservicepage
+    
 customtkinter.set_appearance_mode("dark")
 root = Tk()
 root.geometry('1366x768')
