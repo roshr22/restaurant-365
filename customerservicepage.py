@@ -66,14 +66,17 @@ def orderspage(registration_number):
         capacity = []
         # Create labels and entry boxes and add them to the frame
         for i in range(2, int(worksheet1.max_row) + 1):  
-								exec(f'global quantity{i}')
+            exec(f'global quantity{i}')
             textvalue = worksheet1[f'{column["Item"]}{i}'].value
             pricevalue = worksheet1[f'{column["Price"]}{i}'].value
             exec(f'food{i}label = Label(frame, text=textvalue, bg="white", fg="black", font=("Garamond", 25), bd=0)')
             exec(f'price{i}label = Label(frame, text=pricevalue, bg="white", fg="black", font=("Garamond", 25), bd=0)')
-								exec(f'quantity{i} = Spinbox(frame, from_=0, to=20, bg="white", fg="black", font=("Garamond", 25), bd=0)')
+            spinvariable = StringVar()
+            exec(f'quantity{i} = Spinbox(frame, from_=0, to=20, bg="white", disabledbackground="white", disabledforeground="black", fg="black", font=("Garamond", 25), bd=0, width=2, cursor="hand2", state="disabled", textvariable=spinvariable)')
+            spinvariable.set(
             exec(f'food{i}label.grid(row=i, column=0, padx=70, pady=10)')
             exec(f'price{i}label.grid(row=i, column=1, padx=15, pady=10)')
+            exec(f'quantity{i}.grid(row=i, column=2, padx=70, pady=10)')
 
         # Add the frame to the canvas
         canvas.create_window(10, 10, window=frame, anchor="nw")
@@ -117,8 +120,6 @@ def orderspage(registration_number):
     capacity = []
     # Create labels and entry boxes and add them to the frame
     for i in range(1, int(worksheet.max_row)):
-        print(locals())
-        print(globals())
         exec(f'global table{i}orderbutton')
         exec(f'table{i}label = Label(frame, text=f"TABLE {i}", bg="white", fg="black", font=("Garamond", 25), bd=0)')
         exec(f'table{i}orderbutton = Button(frame, bg="#015450", fg="white", activebackground="#015450", activeforeground="white",text="ORDER", font=("Garamond", 20), bd=0, cursor="hand2", width=12, command = lambda: (order({i})))')
