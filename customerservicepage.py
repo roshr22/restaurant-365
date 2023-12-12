@@ -7,6 +7,9 @@ import os
 from openpyxl import *
 
 final_directory = ""
+
+#Orders page: Asks which table to place order in
+
 """customtkinter.set_appearance_mode("dark")
 root = Tk()
 root.geometry('1366x768')
@@ -28,6 +31,7 @@ reservationsbutton.place(x=180, y=420)
 
 root.mainloop()"""
 
+#Table's Orders Page
 def orderspage(registration_number):
     global final_directory
     global order
@@ -61,11 +65,13 @@ def orderspage(registration_number):
 
         capacity = []
         # Create labels and entry boxes and add them to the frame
-        for i in range(2, int(worksheet1.max_row) + 1):  ###
+        for i in range(2, int(worksheet1.max_row) + 1):  
+								exec(f'global quantity{i}')
             textvalue = worksheet1[f'{column["Item"]}{i}'].value
             pricevalue = worksheet1[f'{column["Price"]}{i}'].value
             exec(f'food{i}label = Label(frame, text=textvalue, bg="white", fg="black", font=("Garamond", 25), bd=0)')
             exec(f'price{i}label = Label(frame, text=pricevalue, bg="white", fg="black", font=("Garamond", 25), bd=0)')
+								exec(f'quantity{i} = Spinbox(frame, from_=0, to=20, bg="white", fg="black", font=("Garamond", 25), bd=0)')
             exec(f'food{i}label.grid(row=i, column=0, padx=70, pady=10)')
             exec(f'price{i}label.grid(row=i, column=1, padx=15, pady=10)')
 
