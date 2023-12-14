@@ -136,7 +136,7 @@ def number_of_tables(registration_number, root1, openingtime, closingtime):
 def tables(tablecount, root1, openingtime, closingtime):
 
     def tabledata(capacity):
-        newrow = {"SNo": "A", "Dish": "B", "Quantity": "C"}
+        newrow = {"SNo": "A", "Dish": "B", "Quantity": "C", "Rate": "D", "Amount": "E"}
         workbook = load_workbook(final_directory)
         worksheet = workbook["Tables"]
         for x in range(1, int(tablecount)+1):

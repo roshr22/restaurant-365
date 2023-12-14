@@ -214,6 +214,7 @@ def signup_page(root1):
     signupbutton = Button(root, bg="#015450", fg="white", activebackground="#015450", activeforeground="white",
                           text="Sign Up", font=('Garamond', 20), bd=0, command=adddata, cursor='hand2')
     signupbutton.place(x=600, y=530)
+    
     loginbutton = Button(root, bg="white", fg="black", activebackground="white", activeforeground="#015450",
                          text="Already have an account? Click here to login", font=('Garamond', 20, "underline"), bd=0,
                          command=lambda: (login(root)), cursor='hand2')
