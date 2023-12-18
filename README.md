@@ -4,10 +4,9 @@ At Restaurant 365, we specialize in helping restaurant owners maximize their bus
 
 ## Features
 - Inventory Management
-- Customer Service (Seat Reservation, Orders and Billing)
-- Menu
-- Salary Management
-- Staff Scheduling
+- Customer Service (Orders and Billing)
+- Menu Management
+- Staff Management
 
 ## Language Used
 Python
