@@ -1,18 +1,20 @@
 from tkinter import *
 import customtkinter
 from PIL import ImageTk
+import os
 
-# customtkinter and tkinter are used for GUI
+#Aboutpage
+def aboutpage(direct):
 
-
-def aboutpage():
-    def signup(root1):
+    #Importing signup page
+    def signup(root1, direct):
         import signuppage
-        signuppage.signup_page(root1)
+        signuppage.signup_page(direct, root1)
 
-    def login(root1):
+    #importing login page
+    def login(root1, direct):
         import loginpage
-        loginpage.login_page(root1)
+        loginpage.login_page(direct, root1)
 
     # Creating a window
     customtkinter.set_appearance_mode("dark")
@@ -21,19 +23,20 @@ def aboutpage():
     root.state('zoomed')
 
     # Placing a background image
-    bgimage = ImageTk.PhotoImage(file='about.png')
+    imgloc = os.path.join(direct, r'images\about.png')
+    bgimage = ImageTk.PhotoImage(file=imgloc)
     bglabel = Label(root, image=bgimage)
     bglabel.place(x=0, y=0)
 
     # Buttons
-    signupbutton = Button(root, text="Sign Up", font=('Garamond', 25), fg="#015450", bg='#D6E3E2',
-                          activeforeground='#015450', activebackground='#D6E3E2', cursor='hand2', bd=0,
-                          command=lambda: (signup(root)))
+    signupbutton = Button(root, text="Sign Up", font=('Garamond', 25), fg="white", bg='#015450',
+                          activeforeground='white', activebackground='#015450', cursor='hand2', bd=0,
+                          command=lambda: (signup(root, direct)))
     signupbutton.place(x=240, y=510)
 
-    loginbutton = Button(root, text="Login", font=('Garamond', 25), fg="#015450", bg='#D6E3E2',
-                         activeforeground='#015450', activebackground='#D6E3E2', cursor='hand2', bd=0,
-                         command=lambda: (login(root)))
+    loginbutton = Button(root, text="Login", font=('Garamond', 25), fg="white", bg='#015450',
+                         activeforeground='white', activebackground='#015450', cursor='hand2', bd=0,
+                         command=lambda: (login(root, direct)))
     loginbutton.place(x=440, y=510)
 
     root.mainloop()

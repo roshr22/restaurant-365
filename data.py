@@ -1,13 +1,15 @@
 from openpyxl import *
 from tkinter import messagebox
+import os
+import restaurant_additional_details as r
 
-
-def data(registration_number, email_id, password_, restaurant_name, phone_number, address_, state_, pincode_):
+def data(direct, registration_number, email_id, password_, restaurant_name, phone_number, address_, state_, pincode_):
     column_names = {"Registration Number": "A", "Email": "B", "Password": "C", "Name": "D", "Phone Number": "E",
                     "Address": "F", "State": "G", "Pincode": "H"}
 
     try:
-        workbook = load_workbook("User_Data.xlsx")
+        excelloc = os.path.join(direct, r'User_Data.xlsx')
+        workbook = load_workbook(excelloc)
         worksheet = workbook["User Data"]
 
     except FileNotFoundError:
@@ -15,17 +17,8 @@ def data(registration_number, email_id, password_, restaurant_name, phone_number
         worksheet = workbook.active
         worksheet.title = "User Data"
         worksheet.append(list(column_names.keys()))
-        workbook.save("User_Data.xlsx")
+        workbook.save(excelloc)
         
-    for i in range(2, worksheet.max_row + 1):
-        email_excel = worksheet[f'{column_names["Email"]}{i}'].value
-        registration_excel = worksheet[f'{column_names["Registration Number"]}{i}'].value
-        if registration_excel == registration_number:
-            messagebox.showerror("Error", f"Account exists! Please login")
-            break
-        elif email_excel == email_id:
-            messagebox.showerror("Error", f"Account exists! Please login or try again with a different email id")
-            break
     else:
         worksheet[f'{column_names["Registration Number"]}{worksheet.max_row+1}'] = registration_number
         worksheet[f'{column_names["Email"]}{worksheet.max_row}'] = email_id
@@ -35,6 +28,7 @@ def data(registration_number, email_id, password_, restaurant_name, phone_number
         worksheet[f'{column_names["Address"]}{worksheet.max_row}'] = address_
         worksheet[f'{column_names["State"]}{worksheet.max_row}'] = state_
         worksheet[f'{column_names["Pincode"]}{worksheet.max_row}'] = pincode_
-        workbook.save("User_Data.xlsx")
+        workbook.save(excelloc)
 
     workbook.close()
+    r.working_hours(direct, registration_number)

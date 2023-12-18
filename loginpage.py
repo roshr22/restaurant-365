@@ -4,15 +4,15 @@ import customtkinter
 from PIL import ImageTk
 from openpyxl import *
 import bcrypt
+import os
 
-
-def login_page(root1):
+def login_page(direct, root1):
     root1.destroy()
     count = 0
     
-    def signup(root1):
+    def signup(root1, direct):
         import signuppage
-        signuppage.signup_page(root1)
+        signuppage.signup_page(direct, root1)
 
     def email(event):
         if emailid.get() == 'Enter Email Id':
@@ -24,23 +24,26 @@ def login_page(root1):
             password.configure(show='*')
 
     def hide():
-        openeye.configure(file='closeye.png')
+        closeyeimg = os.path.join(direct, r'images\closeye.png')
+        openeye.configure(file=closeyeimg)
         password.configure(show='')
         eyebutton.configure(command=show)
         
     def show():
-        openeye.configure(file='openeye.png')
+        openeyeimg = os.path.join(direct, r'images\openeye.png')
+        openeye.configure(file=openeyeimg)
         password.configure(show='*')
         eyebutton.configure(command=hide)
 
-    def verification():
+    def verification(direct):
         email_id = emailid.get()
         password_ = password.get().encode('UTF-8')
         column_names = {"Registration Number": "A", "Email": "B", "Password": "C", "Name": "D", "Phone Number": "E",
                         "Address": "F", "State": "G", "Pincode": "H"}
 
         try:
-            workbook = load_workbook("User_Data.xlsx")
+            workbookpath = os.path.join(direct, r'User_Data.xlsx')
+            workbook = load_workbook(workbookpath)
             worksheet = workbook["User Data"]
 
         except FileNotFoundError:
@@ -50,8 +53,12 @@ def login_page(root1):
         for i in range(2, worksheet.max_row + 1):
             email_excel = worksheet[f'{column_names["Email"]}{i}'].value
             password_excel = worksheet[f'{column_names["Password"]}{i}'].value.encode('UTF-8')
+            registration_excel = worksheet[f'{column_names["Registration Number"]}{i}'].value
             if email_excel == email_id and bcrypt.checkpw(password_, password_excel):
+                datadirect = os.path.join(direct, registration_excel)
+                root.destroy()
                 import landingpage
+                landingpage.landingpage(direct, datadirect)
                 break
             elif email_excel == email_id and not bcrypt.checkpw(password_, password_excel):
                 messagebox.showerror("Error", "Incorrect Password! Try again")
@@ -67,7 +74,8 @@ def login_page(root1):
     root.state('zoomed')
 
     # Placing a background colour
-    loginimage = ImageTk.PhotoImage(file='login.png')
+    bgimg = os.path.join(direct, r'images\login.png')
+    loginimage = ImageTk.PhotoImage(file=bgimg)
     loginimagelabel = Label(root, image=loginimage)
     loginimagelabel.place(x=0, y=0)
 
@@ -89,16 +97,17 @@ def login_page(root1):
     password.bind('<FocusIn>', passwd)
     line5 = Frame(root, height=2, width=375, bg="black")
     line5.place(x=185, y=355)
-    openeye = PhotoImage(file='openeye.png')
+    openeyeimg = os.path.join(direct, r'images\openeye.png')
+    openeye = PhotoImage(file=openeyeimg)
     eyebutton = Button(root, image=openeye, bd=0, bg='white', activebackground='white', cursor='hand2', command=hide)
     eyebutton.place(x=550, y=320)
 
     loginbutton = Button(root, bg="#015450", fg="white", activebackground="#015450", activeforeground="white",
-                         text="Login", font=('Garamond', 20), bd=0, cursor='hand2', command=verification)
+                         text="Login", font=('Garamond', 20), bd=0, cursor='hand2', command=lambda:(verification(direct)))
     loginbutton.place(x=350, y=410)
 
     signupbutton = Button(root, bg="white", fg="black", activebackground="white", activeforeground="#015450",
                           text="New to Restaurant 365? Click here to signup", font=('Garamond', 20, "underline"), bd=0,
-                          command=lambda: (signup(root)), cursor='hand2')
+                          command=lambda: (signup(root, direct)), cursor='hand2')
     signupbutton.place(x=140, y=470)
     root.mainloop()

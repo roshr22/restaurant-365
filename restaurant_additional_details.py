@@ -6,33 +6,29 @@ import os
 from openpyxl import *
 from PIL import ImageTk
 
-
 class Table:
     def __init__(self, name, capacity):
         self.name = "Table " + name
         self.capacity = capacity
 
-
 column_names = {"Table Number": "A", "Capacity": "B"}
-final_directory = ""
 
-def excel(registration_number):
-    global final_directory
-    current_directory = os.getcwd()
-    directory = registration_number
-    final_directory = os.path.join(current_directory, directory)
-    if not os.path.exists(final_directory):
-        os.makedirs(final_directory)
+datadirect=""
+
+def excel(direct, registration_number):
+    global datadirect
+    datadirect = os.path.join(direct, registration_number)
+    if not os.path.exists(datadirect):
+        os.makedirs(datadirect)
 
     workbook = Workbook()
     worksheet = workbook.active
     worksheet.title = "Tables"
     worksheet.append(list(column_names.keys()))
-    final_directory += r"\Customer Service.xlsx"
-    workbook.save(final_directory)
+    workbook.save(datadirect + r"\Customer Service.xlsx")
 
 
-def working_hours(registration_number):
+def working_hours(direct, registration_number):
     def times():
         l = []
         for i in range(0,24):
@@ -60,7 +56,8 @@ def working_hours(registration_number):
         closingtimedropdown["values"] = l1
 
     def addtiming():
-        workbook = load_workbook("User_Data.xlsx")
+        excelloc = os.path.join(direct, r'User_Data.xlsx')
+        workbook = load_workbook(excelloc)
         worksheet = workbook["User Data"]
         worksheet['I1'] = "Opening Time"
         worksheet['J1'] = "Closing Time"
@@ -74,7 +71,8 @@ def working_hours(registration_number):
     root.geometry('1366x768')
     root.state('zoomed')
 
-    bgimage = ImageTk.PhotoImage(file='workinghours.png')
+    imgloc = os.path.join(direct, r'images\workinghours.png')
+    bgimage = ImageTk.PhotoImage(file=imgloc)
     bglabel = Label(root, image=bgimage)
     bglabel.place(x=0, y=0)
 
@@ -97,25 +95,25 @@ def working_hours(registration_number):
     closingtimedropdown.place(x=750, y=350)
 
     continuebutton = Button(root, bg="#015450", fg="white", activebackground="#015450", activeforeground="white",
-                            text="Continue", font=('Garamond', 22), bd=0, cursor='hand2', command = lambda:(addtiming(), number_of_tables(registration_number, root, openingtimedropdown.get(), closingtimedropdown.get())))
+                            text="Continue", font=('Garamond', 22), bd=0, cursor='hand2', command = lambda:(addtiming(), number_of_tables(direct, registration_number, root)))
     continuebutton.place(x=595, y=450)
     root.mainloop()
 
-def number_of_tables(registration_number, root1, openingtime, closingtime):
-
+def number_of_tables(direct, registration_number, root1):
     def tablecount_check():
         if (tablecount.get().strip().isdigit() is True and int(tablecount.get().strip()) > 0):
-            tables(tablecount.get().strip(), root, openingtime, closingtime)
+            tables(direct, datadirect, tablecount.get().strip(), root)
         else:
             messagebox.showerror('Error', 'Invalid Table Count')
     root1.destroy()
-    excel(registration_number)
+    excel(direct, registration_number)
     customtkinter.set_appearance_mode("dark")
     root = Tk()
     root.geometry('1366x768')
     root.state('zoomed')
 
-    bgimage = ImageTk.PhotoImage(file='tabledetails.png')
+    imgloc = os.path.join(direct, r'images\tabledetails.png')
+    bgimage = ImageTk.PhotoImage(file=imgloc)
     bglabel = Label(root, image=bgimage)
     bglabel.place(x=0, y=0)
 
@@ -133,11 +131,10 @@ def number_of_tables(registration_number, root1, openingtime, closingtime):
     root.mainloop()
 
 
-def tables(tablecount, root1, openingtime, closingtime):
-
+def tables(direct, datadirect, tablecount, root1):
     def tabledata(capacity):
         newrow = {"SNo": "A", "Dish": "B", "Quantity": "C", "Rate": "D", "Amount": "E"}
-        workbook = load_workbook(final_directory)
+        workbook = load_workbook(datadirect + r"\Customer Service.xlsx")
         worksheet = workbook["Tables"]
         for x in range(1, int(tablecount)+1):
             if capacity[x-1].get().strip() == "":
@@ -157,42 +154,12 @@ def tables(tablecount, root1, openingtime, closingtime):
                     workbook.create_sheet(title=f'Table {x}')
                     worksheetnew = workbook[f'Table {x}']
                     worksheetnew.append(list(newrow.keys()))
-                workbook.save(final_directory)
+                workbook.save(datadirect + r"\Customer Service.xlsx")
 
-    def timing(openingtime, closingtime):
-        workbook = load_workbook(final_directory)
-        worksheet = workbook["Tables"]
-        l=[]
-        for x in range(int(openingtime[0:2]), int(closingtime[0:2])+1):
-            if x == int(openingtime[0:2]) and openingtime.endswith("30") is True:
-                l.append(openingtime)
-            elif x == int(closingtime[0:2]) and closingtime.endswith("00") is True:
-                l.append(closingtime)
-                break
-            elif len(str(x)) == 1:
-                l.append(f'0{x}:00')
-                l.append(f'0{x}:30')
-            else:
-                l.append(f'{x}:00')
-                l.append(f'{x}:30')
-
-        d={}
-        for i in l:
-            if (67 + l.index(i)) > 90:
-                d[i] = 'A'+chr(l.index(i)-24+65)
-                continue
-            d[i] = chr(67 + l.index(i))
-
-        for i in d:
-            for j in range(int(tablecount)+1):
-                if j == 0:
-                    worksheet[d[i]+str(j+1)] = i
-                else:
-                    worksheet[d[i]+str(j+1)] = False
-
-        workbook.save(final_directory)
-            
-
+    def landingpg(direct, datadirect, root1):
+        root1.destroy()
+        import landingpage
+        landingpage.landingpage(direct, datadirect)
 
     root1.destroy()
     customtkinter.set_appearance_mode("dark")
@@ -200,7 +167,8 @@ def tables(tablecount, root1, openingtime, closingtime):
     root.geometry('1366x768')
     root.state('zoomed')
 
-    bgimage = ImageTk.PhotoImage(file='tabledetails.png')
+    imgloc = os.path.join(direct, r'images\tabledetails.png')
+    bgimage = ImageTk.PhotoImage(file=imgloc)
     bglabel = Label(root, image=bgimage)
     bglabel.place(x=0, y=0)
 
@@ -240,12 +208,10 @@ def tables(tablecount, root1, openingtime, closingtime):
 
     continuebutton = Button(root, bg="#015450", fg="white", activebackground="#015450", activeforeground="white",
                             text="Continue", font=('Garamond', 20), bd=0, cursor='hand2',
-                            command=lambda: (tabledata(capacity),timing(openingtime,closingtime)))
+                            command=lambda: (tabledata(capacity), landingpg(direct, datadirect, root)))
     continuebutton.place(x=590, y=570)
 
     # Start the main loop
     root.mainloop()
-
-working_hours("11111111111111")
 
 

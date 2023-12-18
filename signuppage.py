@@ -3,15 +3,16 @@ from tkinter import messagebox
 from tkinter import ttk
 import customtkinter
 import bcrypt
+import os
+from openpyxl import *
 
-
-# customtkinter and tkinter are used for GUI
-def signup_page(root1):
+#Signup Page
+def signup_page(direct, root1):
     root1.destroy()
         
-    def login(root1):
+    def login(direct, root1):
         import loginpage
-        loginpage.login_page(root1)
+        loginpage.login_page(direct, root1)
     
     def restname(event):
         if restaurantname.get() == 'Enter Restaurant Name':
@@ -43,16 +44,19 @@ def signup_page(root1):
             pincode.delete(0, END)
 
     def hide():
-        openeye.configure(file='closeye.png')
+        closeeyeloc = os.path.join(direct, r'images\closeye.png')
+        openeye.configure(file=closeeyeloc)
         password.configure(show='')
         eyebutton.configure(command=show)
 
     def show():
-        openeye.configure(file='openeye.png')
+        openeyeloc = os.path.join(direct, r'images\openeye.png')
+        openeye.configure(file=openeyeloc)
         password.configure(show='*')
         eyebutton.configure(command=hide)
 
-    def adddata():
+    #Validating Input Data
+    def adddata(direct):
         restaurant_name = restaurantname.get()
         registration_number = registrationnumber.get().strip()
         phone_number = phonenumber.get()
@@ -111,18 +115,38 @@ def signup_page(root1):
         elif var.get() == 0:  # Error if terms & condition box is not checked
             messagebox.showerror('Error', 'Accept our Terms and Conditions')
         else:
-            password_ = password_.encode('utf-8')
-            salt = bcrypt.gensalt()
-            password_ = bcrypt.hashpw(password_, salt)
-            verification(restaurantname.get(), emailid.get(), root, registration_number, password_, restaurant_name,
-                         phone_number, address_, state_, pincode_)
+            workbookloc = os.path.join(direct + r"User_Data.xlsx")
+            column_names = {"Registration Number": "A", "Email": "B", "Password": "C", "Name": "D", "Phone Number": "E","Address": "F", "State": "G", "Pincode": "H"}
+            try:
+                workbook = load_workbook(workbookloc)
+                worksheet = workbook["User Data"]
+                for i in range(2, worksheet.max_row + 1):
+                    registration_excel = worksheet[f'{column_names["Registration Number"]}{i}'].value
+                    if registration_excel == registration_number:
+                        messagebox.showerror("Error", f"Account exists! Please login")
+                        break
+                else:    
+                    for i in range(2, worksheet.max_row + 1):
+                        email_excel = worksheet[f'{column_names["Email"]}{i}'].value
+                        if email_excel == email_id:
+                            messagebox.showerror("Error", f"Account exists! Please login or try again with a different email id")
+                            break
+                    else:
+                        password_ = password_.encode('utf-8')
+                        salt = bcrypt.gensalt()
+                        password_ = bcrypt.hashpw(password_, salt)
+                        verification(direct, root, email_id, registration_number, password_, restaurant_name, phone_number, address_,state_, pincode_)
+            except FileNotFoundError:
+                password_ = password_.encode('utf-8')
+                salt = bcrypt.gensalt()
+                password_ = bcrypt.hashpw(password_, salt)
+                verification(direct, root, email_id, registration_number, password_, restaurant_name, phone_number, address_,state_, pincode_)
         
-    def verification(name, email_id, root1, registration_number, password_, restaurant_name, phone_number, address_,
-                     state_, pincode_):
+    def verification(direct, root, email_id, registration_number, password_, restaurant_name, phone_number, address_,state_, pincode_):
         import emailverification
-        emailverification.verification_window(name, email_id, root1, registration_number, password_, restaurant_name,
-                                              phone_number, address_, state_, pincode_)
-        
+        emailverification.verification_window(direct, root, email_id, registration_number, password_, restaurant_name, phone_number, address_,state_, pincode_)
+
+    #Creating new window    
     customtkinter.set_appearance_mode("dark")
     root = Tk()
     root.geometry('1366x768')
@@ -132,75 +156,90 @@ def signup_page(root1):
     bglabel = Label(root, bg="white", width=1366, height=768)
     bglabel.place(x=0, y=0)
 
-    signuplabel = Label(root, bg="white", fg="black", text="Sign Up", font=('Garamond', 60, "bold"), bd=0)
+    signuplabel = Label(root, bg="white", fg="black", text="SIGN UP", font=('Garamond', 60, "bold"), bd=0)
     signuplabel.place(x=500, y=20)
 
     # Restaurant Name
-    restaurantname = Entry(root, bg="white", fg="black", font=('Garamond', 20), width=28, bd=0)
-    restaurantname.place(x=160, y=165)
+    restaurantnamelabel = Label(root, bg="white", fg="black", text="Restaurant Name", font=('Garamond', 23),
+                                bd=0)
+    restaurantnamelabel.place(x=160, y=130)
+    restaurantname = Entry(root, bg="white", fg="grey", font=('Garamond', 17), width=28, bd=0)
+    restaurantname.place(x=160, y=170)
     restaurantname.insert(0, "Enter Restaurant Name")
     restaurantname.bind('<FocusIn>', restname)
     line1 = Frame(root, height=2, width=375, bg="black")
     line1.place(x=155, y=200)
 
-    # Registration Number
-    registrationnumber = Entry(root, bg="white", fg="black", font=('Garamond', 20), width=28, bd=0)
-    registrationnumber.place(x=760, y=165)
-    registrationnumber.insert(0, "Enter Registration Number")
-    registrationnumber.bind('<FocusIn>', regnum)
-    line2 = Frame(root, height=2, width=375, bg="black")
-    line2.place(x=755, y=200)
-
     # Phone Number
-    phonenumber = Entry(root, bg="white", fg="black", font=('Garamond', 20), width=28, bd=0)
-    phonenumber.place(x=160, y=245)
+    phonenumberlabel = Label(root, bg="white", fg="black", text="Phone Number", font=('Garamond', 23), bd=0)
+    phonenumberlabel.place(x=160, y=210)
+    phonenumber = Entry(root, bg="white", fg="grey", font=('Garamond', 17), width=28, bd=0)
+    phonenumber.place(x=160, y=250)
     phonenumber.insert(0, "Enter Phone Number")
     phonenumber.bind('<FocusIn>', phoneno)
     line3 = Frame(root, height=2, width=375, bg="black")
     line3.place(x=155, y=280)
 
     # Email
-    emailid = Entry(root, bg="white", fg="black", font=('Garamond', 20), width=28, bd=0)
-    emailid.place(x=160, y=325)
+    emailidlabel = Label(root, bg="white", fg="black", text="Email Id", font=('Garamond', 23), bd=0)
+    emailidlabel.place(x=160, y=290)
+    emailid = Entry(root, bg="white", fg="grey", font=('Garamond', 17), width=28, bd=0)
+    emailid.place(x=160, y=330)
     emailid.insert(0, "Enter Email Id")
     emailid.bind('<FocusIn>', email)
     line4 = Frame(root, height=2, width=375, bg="black")
     line4.place(x=155, y=360)
 
     # Password
-    password = Entry(root, bg="white", fg="black", font=('Garamond', 20), width=28, bd=0)
-    password.place(x=160, y=405)
+    passwordlabel = Label(root, bg="white", fg="black", text="Password", font=('Garamond', 23), bd=0)
+    passwordlabel.place(x=160, y=370)
+    password = Entry(root, bg="white", fg="grey", font=('Garamond', 17), width=28, bd=0)
+    password.place(x=160, y=410)
     password.insert(0, "Enter Password")
     password.bind('<FocusIn>', passwd)
     line5 = Frame(root, height=2, width=375, bg="black")
     line5.place(x=155, y=445)
-    openeye = PhotoImage(file='openeye.png')
-    eyebutton = Button(root, image=openeye, bd=0, bg='white', activebackground='white', cursor='hand2', command=hide)
-    eyebutton.place(x=520, y=410)
+    openeyeloc = os.path.join(direct, r'images\openeye.png')
+    openeye = PhotoImage(file=openeyeloc)
+    eyebutton = Button(root, image=openeye, bd=0, bg='white', activebackground='white', cursor='hand2',
+                       command=hide)
+    eyebutton.place(x=520, y=415)
+
+    # Registration Number
+    registrationnumberlabel = Label(root, bg="white", fg="black", text="Registration Number",
+                                    font=('Garamond', 23), bd=0)
+    registrationnumberlabel.place(x=760, y=130)
+    registrationnumber = Entry(root, bg="white", fg="grey", font=('Garamond', 17), width=28, bd=0)
+    registrationnumber.place(x=760, y=170)
+    registrationnumber.insert(0, "Enter Registration Number")
+    registrationnumber.bind('<FocusIn>', regnum)
+    line2 = Frame(root, height=2, width=375, bg="black")
+    line2.place(x=755, y=200)
 
     # Address
-    address = Entry(root, bg="white", fg="black", font=('Garamond', 20), width=28, bd=0)
-    address.place(x=760, y=245)
+    addresslabel = Label(root, bg="white", fg="black", text="Address", font=('Garamond', 23), bd=0)
+    addresslabel.place(x=760, y=210)
+    address = Entry(root, bg="white", fg="grey", font=('Garamond', 17), width=28, bd=0)
+    address.place(x=760, y=250)
     address.insert(0, "Enter Address")
     address.bind('<FocusIn>', addr)
     line6 = Frame(root, height=2, width=375, bg="black")
     line6.place(x=755, y=280)
 
     # State
+    statelabel = Label(root, bg="white", fg="black", text="State", font=('Garamond', 23), bd=0)
+    statelabel.place(x=760, y=290)
     n = StringVar(value="Enter State") 
-    state = ttk.Combobox(root, width=28, font=('Garamond', 20), textvariable=n)
-    state['values'] = ('Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat',
-                       'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh',
-                       'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 'Rajasthan',
-                       'Sikkim', 'Tamil Nadu', 'Telengana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
-                       'Andaman and Nicobar Islands', 'Chandigarh', 'Delhi', 'Dadra and Nagar Naveli and Daman and Diu',
-                       'Jammu and Kashmir', 'Ladakh', 'Lakshadweep', 'Puducherry')
+    state = ttk.Combobox(root, width=28, font=('Garamond', 17), textvariable=n)
+    state['values'] = ('Andaman and Nicobar Islands', 'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chandigarh', 'Chhattisgarh', 'Dadra and Nagar Haveli and Daman and Diu', 'Delhi', 'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jammu and Kashmir', 'Jharkhand', 'Karnataka', 'Kerala', 'Ladakh', 'Lakshadweep', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Puducherry', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal')
     state['state']='readonly'
-    state.place(x=755, y=325)
+    state.place(x=755, y=330)
 
     # Pincode
-    pincode = Entry(root, bg="white", fg="black", font=('Garamond', 20), width=28, bd=0)
-    pincode.place(x=760, y=405)
+    pincodelabel = Label(root, bg="white", fg="black", text="Pincode", font=('Garamond', 23), bd=0)
+    pincodelabel.place(x=760, y=370)
+    pincode = Entry(root, bg="white", fg="grey", font=('Garamond', 17), width=28, bd=0)
+    pincode.place(x=760, y=410)
     pincode.insert(0, "Enter Pincode")
     pincode.bind('<FocusIn>', pincd)
     line8 = Frame(root, height=2, width=375, bg="black")
@@ -211,13 +250,14 @@ def signup_page(root1):
                         text='I agree to the Terms of Service and Privacy Policy of Restaurant 365 and Metamorphosis')
     check.place(x=135, y=470)
 
+    #Buttons
     signupbutton = Button(root, bg="#015450", fg="white", activebackground="#015450", activeforeground="white",
-                          text="Sign Up", font=('Garamond', 20), bd=0, command=adddata, cursor='hand2')
+                          text="Sign Up", font=('Garamond', 20), bd=0, command=lambda:(adddata(direct)), cursor='hand2')
     signupbutton.place(x=600, y=530)
     
     loginbutton = Button(root, bg="white", fg="black", activebackground="white", activeforeground="#015450",
                          text="Already have an account? Click here to login", font=('Garamond', 20, "underline"), bd=0,
-                         command=lambda: (login(root)), cursor='hand2')
+                         command=lambda: (login(direct, root)), cursor='hand2')
     loginbutton.place(x=420, y=580)
 
     root.mainloop()

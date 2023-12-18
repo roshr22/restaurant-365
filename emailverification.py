@@ -6,11 +6,12 @@ from tkinter import messagebox
 import customtkinter
 from PIL import ImageTk
 import sys
+import os
 
 otp = 0
 
 
-def verification_window(name, email_id, root1, registration_number, password_, restaurant_name, phone_number, address_,
+def verification_window(direct, root1, email_id, registration_number, password_, name, phone_number, address_,
                         state_, pincode_):
     global otp
     count = 0
@@ -27,16 +28,17 @@ def verification_window(name, email_id, root1, registration_number, password_, r
             sys.exit(0)
             
         elif int(OTP) == otp and count < 2:
-            data(registration_number, email_id, password_, restaurant_name, phone_number, address_, state_, pincode_)
+            data(root, direct, registration_number, email_id, password_, name, phone_number, address_, state_, pincode_)
         
         elif int(OTP) != otp and count < 2:
             messagebox.showerror('Error', 'Invalid OTP! Resending OTP...')
             verification(name, email_id)
             count += 1
 
-    def data(registration_number, email_id, password_, restaurant_name, phone_number, address_, state_, pincode_):
+    def data(root1, direct, registration_number, email_id, password_, restaurant_name, phone_number, address_, state_, pincode_):
+        root1.destroy()
         import data
-        data.data(registration_number, email_id, password_, restaurant_name, phone_number, address_, state_, pincode_)
+        data.data(direct, registration_number, email_id, password_, restaurant_name, phone_number, address_, state_, pincode_)
     
     verification(name, email_id)
     root1.destroy()
@@ -48,7 +50,9 @@ def verification_window(name, email_id, root1, registration_number, password_, r
     # Placing a background colour
     bgframe = Label(root, bg="white", width=1366, height=768)
     bgframe.place(x=0, y=0)
-    bgimage = ImageTk.PhotoImage(file='emailverification.png')
+
+    imgloc = os.path.join(direct, r'images\emailverification.png')
+    bgimage = ImageTk.PhotoImage(file=imgloc)
     bglabel = Label(root, image=bgimage, bd=0)
     bglabel.pack()
 
